@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:gravity="bottom">
+
+        <View
+            android:id="@+id/menu_bg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#77787878"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/menu_lv_layout"
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:layout_gravity="top"
+            android:background="#FFFFFF"
+            android:clickable="true"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <LinearLayout
+                    android:id="@+id/menu_lv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="6">
+
+                        <ListView
+                            android:id="@+id/list_l1"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="#55787878" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="4">
+
+                        <ListView
+                            android:id="@+id/list_l2"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/no_data_tip"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="数据加载错误，请稍后再试"
+                        android:textColor="#66000000"
+                        android:textSize="16sp" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <LinearLayout
+                android:id="@+id/close_shank"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:background="#ffeeee"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="10dp"
+                    android:background="#676767" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>
