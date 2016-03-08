@@ -1,7 +1,10 @@
 package com.menu;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +29,7 @@ public class MainActivity extends Activity {
     private TextView mFilter;
     private NNMenu btmMenuType;
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +49,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 btmMenuType.showOrHidMenu();
+                startActivity(new Intent(MainActivity.this, MenuActivity.class));
             }
         });
 
