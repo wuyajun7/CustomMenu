@@ -35,27 +35,43 @@ public class SliderView extends ViewGroup {
                 view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
             }
         }
+        if (!slided) return;
         scroller.startScroll(0, getTop(), arg3, 0, 0);//默认隐藏
     }
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        //区域拦截
-        View view = getChildAt(1);
-        if (ev.getX() < view.getWidth() * 1 / 4) {
-            return false;
+        if (!slided) {
+            //区域拦截
+            View view = getChildAt(1);
+            if (ev.getX() < view.getWidth() * 1 / 4) {
+                return false;
+            }
         }
         return true;
     }
 
+    private float mStartX;
+    private float mStartY;
+    private float mEndX;
+    private float mEndY;
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+
+        float minMove = 50;//平移移动距离
+        float maxLFMove = 800;//左右倾斜移动距离限制
+        float maxUDMove = 120;//上下倾斜移动距离限制
+
         if (mVelocityTracker == null) {
             mVelocityTracker = VelocityTracker.obtain();
         }
         mVelocityTracker.addMovement(event);
         int action = event.getAction();
         if (action == MotionEvent.ACTION_DOWN) {
+            mStartX = event.getX();
+            mStartY = event.getY();
+
             x = event.getX();
             if (isSlided()) {//分发事件
                 dispatched = dispatchTouchEventToView(getChildAt(0), event);
@@ -63,21 +79,25 @@ public class SliderView extends ViewGroup {
                 dispatched = dispatchTouchEventToView(getChildAt(1), event);
             }
         } else if (action == MotionEvent.ACTION_MOVE) {
+            mEndX = event.getX();
+            mEndY = event.getY();
+
             if (dispatched) {//分发事件
                 if (isSlided()) {
                     dispatchTouchEventToView(getChildAt(0), event);
                 } else {
-                    dispatchTouchEventToView(getChildAt(1), event);
-                }
-            } else {//重置第一个子view位置
-                float dx = event.getX() - x;
-                View view = getChildAt(1);
-                if (x > view.getWidth() * 1 / 4) {
-                    int left = (int) (view.getLeft() + dx);
-                    if (left >= 0) {
-                        view.layout(left, view.getTop(), view.getWidth() + left, view.getTop() + view.getHeight());
+                    if (mEndY - mStartY > minMove && Math.abs(mEndX - mStartX) < maxUDMove) {//向下
+                        dispatchTouchEventToView(getChildAt(1), event);
+                    } else if (mEndY - mStartY < minMove && Math.abs(mEndX - mStartX) < maxUDMove) {//向上
+                        dispatchTouchEventToView(getChildAt(1), event);
+                    } else if (mEndX - mStartX > minMove && Math.abs(mEndY - mStartY) < maxLFMove) {//向右
+                        setLayoutXY(event);
+                    } else if (mEndX - mStartX < minMove && Math.abs(mEndY - mStartY) < maxLFMove) {//向左
+                        setLayoutXY(event);
                     }
                 }
+            } else {//重置第一个子view位置
+                setLayoutXY(event);
             }
             x = event.getX();
         } else if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
@@ -85,36 +105,60 @@ public class SliderView extends ViewGroup {
                 if (isSlided()) {
                     dispatchTouchEventToView(getChildAt(0), event);
                 } else {
-                    dispatchTouchEventToView(getChildAt(1), event);
+                    if (mEndY - mStartY > minMove && Math.abs(mEndX - mStartX) < maxUDMove) {//向下
+                        dispatchTouchEventToView(getChildAt(1), event);
+                    } else if (mEndY - mStartY < minMove && Math.abs(mEndX - mStartX) < maxUDMove) {//向上
+                        dispatchTouchEventToView(getChildAt(1), event);
+                    } else if (mEndX - mStartX > minMove && Math.abs(mEndY - mStartY) < maxLFMove) {//向右
+                        patchView(event);
+                    } else if (mEndX - mStartX < minMove && Math.abs(mEndY - mStartY) < maxLFMove) {//向左
+                        patchView(event);
+                    }
                 }
             } else {
-                //判断速度
-                mVelocityTracker.computeCurrentVelocity(1000);
-                View view = getChildAt(1);
-                if (x >= view.getWidth() * 1 / 4) {
-                    int velocityX = (int) mVelocityTracker.getXVelocity();
-                    if (velocityX > VELOCITY_X_SPEED) {
-                        setSlided(true);
-                    } else if (velocityX < -VELOCITY_X_SPEED) {
-                        setSlided(false);
-                    } else {
-                        if (view.getLeft() >= view.getWidth() / 2) {
-                            setSlided(true);
-                        } else {
-                            setSlided(false);
-                        }
-                    }
-                } else {
-                    //事件分发给同级view，相应相应位置-分发之前做拦截-onInterceptTouchEvent
-                    dispatchTouchEventToView(getChildAt(1), event);
-                }
-                if (mVelocityTracker != null) {
-                    mVelocityTracker.recycle();
-                    mVelocityTracker = null;
-                }
+                patchView(event);
             }
         }
         return true;
+    }
+
+    private void patchView(MotionEvent event) {
+        //判断速度
+        mVelocityTracker.computeCurrentVelocity(1000);
+        View view = getChildAt(1);
+        if (x >= view.getWidth() * 1 / 4) {
+            int velocityX = (int) mVelocityTracker.getXVelocity();
+            if (velocityX > VELOCITY_X_SPEED) {
+                setSlided(true);
+            } else if (velocityX < -VELOCITY_X_SPEED) {
+                setSlided(false);
+            } else {
+                if (view.getLeft() >= view.getWidth() / 2) {
+                    setSlided(true);
+                } else {
+                    setSlided(false);
+                }
+            }
+        } else {
+            //事件分发给同级view，相应相应位置-分发之前做拦截-onInterceptTouchEvent
+            dispatchTouchEventToView(getChildAt(1), event);
+        }
+        if (mVelocityTracker != null) {
+            mVelocityTracker.recycle();
+            mVelocityTracker = null;
+        }
+    }
+
+    //设置布局位置
+    private void setLayoutXY(MotionEvent event) {
+        float dx = event.getX() - x;
+        View view = getChildAt(1);
+        if (x > view.getWidth() * 1 / 4) {
+            int left = (int) (view.getLeft() + dx);
+            if (left >= 0) {
+                view.layout(left, view.getTop(), view.getWidth() + left, view.getTop() + view.getHeight());
+            }
+        }
     }
 
     public boolean isSlided() {
@@ -143,8 +187,7 @@ public class SliderView extends ViewGroup {
         if (scroller.computeScrollOffset()) {
             View view = getChildAt(1);
             int left = startScrollLeftOffset + scroller.getCurrX();
-            view.layout(left, view.getTop(), left + view.getWidth(),
-                    view.getHeight());
+            view.layout(left, view.getTop(), left + view.getWidth(), view.getHeight());
             postInvalidate();
         }
     }
