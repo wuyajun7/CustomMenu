@@ -107,8 +107,10 @@ public class SliderView extends ViewGroup {
                 } else {
                     if (mEndY - mStartY > minMove && Math.abs(mEndX - mStartX) < maxUDMove) {//向下
                         dispatchTouchEventToView(getChildAt(1), event);
+                        postInvalidate();
                     } else if (mEndY - mStartY < minMove && Math.abs(mEndX - mStartX) < maxUDMove) {//向上
                         dispatchTouchEventToView(getChildAt(1), event);
+                        postInvalidate();
                     } else if (mEndX - mStartX > minMove && Math.abs(mEndY - mStartY) < maxLFMove) {//向右
                         patchView(event);
                     } else if (mEndX - mStartX < minMove && Math.abs(mEndY - mStartY) < maxLFMove) {//向左

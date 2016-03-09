@@ -26,10 +26,10 @@ public class NNMenuAdapter extends WNBaseAdapter<Object> {
         if (object instanceof String) {
             TextView textView = holder.getView(R.id.menu_item_title);
             textView.setText((String) object);
-            textView.setBackgroundResource(R.drawable.menu_item_bg);
-            if (selectedIndex != -1 && selectedIndex == position) {
-                textView.setBackgroundResource(R.drawable.menu_item_select_bg);
-            }
+//            textView.setBackgroundResource(R.drawable.menu_item_bg);
+//            if (selectedIndex != -1 && selectedIndex == position) {
+//                textView.setBackgroundResource(R.drawable.menu_item_select_bg);
+//            }
         }
     }
 
